@@ -27,6 +27,7 @@ export const Home = () => {
   });
   const task = watch("task");
   const isSubmitButtonDisabled = !task;
+  console.log(formState.errors);
   function handleCreateNewCycle(data: any) {}
 
   return (
