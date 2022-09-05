@@ -1,6 +1,7 @@
 import { Play } from "phosphor-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { differenceInSeconds } from "date-fns";
 import * as zod from "zod";
 
 import {
@@ -12,7 +13,7 @@ import {
   StartCountDownButton,
   TaskInput,
 } from "./styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, "Informe a tarefa"),
@@ -28,6 +29,7 @@ interface Cycle {
   id: string;
   task: string;
   minutesAmount: number;
+  startDate: Date;
 }
 
 export const Home = () => {
@@ -40,9 +42,17 @@ export const Home = () => {
       resolver: zodResolver(newCycleFormValidationSchema),
       defaultValues: { task: "", minutesAmount: 0 },
     });
-  const task = watch("task");
-  const isSubmitButtonDisabled = !task;
-  console.log(formState.errors);
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
+
+  useEffect(() => {
+    if (activeCycle) {
+      setInterval(() => {
+        setAmountSecondsPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate)
+        );
+      }, 1000);
+    }
+  }, [activeCycle]);
 
   function handleCreateNewCycle(data: NewCycleFormData) {
     const cycleId = new Date().getTime().toString();
@@ -50,6 +60,7 @@ export const Home = () => {
       id: cycleId,
       task: data.task,
       minutesAmount: data.minutesAmount,
+      startDate: new Date(),
     };
 
     // sempre que um novo estado, precisa do estado anterior, usa-se 'state'
@@ -57,8 +68,6 @@ export const Home = () => {
     setActiveCycleId(cycleId);
     reset();
   }
-
-  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
@@ -68,6 +77,10 @@ export const Home = () => {
 
   const minutes = minutesAmount.toString().padStart(2, "0");
   const seconds = secondsAmount.toString().padStart(2, "0");
+
+  const task = watch("task");
+  const isSubmitButtonDisabled = !task;
+  console.log(formState.errors);
 
   return (
     <HomeContainer>
