@@ -12,6 +12,7 @@ import {
   StartCountDownButton,
   TaskInput,
 } from "./styles";
+import { useState } from "react";
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, "Informe a tarefa"),
@@ -23,7 +24,16 @@ const newCycleFormValidationSchema = zod.object({
 
 type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>;
 
+interface Cycle {
+  id: string;
+  task: string;
+  minutesAmount: number;
+}
+
 export const Home = () => {
+  const [cycles, setCycles] = useState<Cycle[]>([]);
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null);
+
   const { register, handleSubmit, watch, formState, reset } =
     useForm<NewCycleFormData>({
       resolver: zodResolver(newCycleFormValidationSchema),
@@ -34,8 +44,20 @@ export const Home = () => {
   console.log(formState.errors);
 
   function handleCreateNewCycle(data: NewCycleFormData) {
+    const cycleId = new Date().getTime().toString();
+    const newCycle: Cycle = {
+      id: cycleId,
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+    };
+
+    // sempre que um novo estado, precisa do estado anterior, usa-se 'state'
+    setCycles((state) => [...state, newCycle]);
+    setActiveCycleId(cycleId);
     reset();
   }
+
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId);
 
   return (
     <HomeContainer>
