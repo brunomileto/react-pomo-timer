@@ -1,6 +1,6 @@
 import { HandPalm, Play } from "phosphor-react";
 import { createContext, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as zod from "zod";
 
@@ -11,7 +11,6 @@ import {
 } from "./styles";
 import { NewCycleForm } from "./components/NewCycleForm";
 import { CountDown } from "./components/CountDown";
-import { FormProvider } from "react-hook-form/dist/useFormContext";
 
 interface CyclesContextType {
   activeCycle: Cycle | undefined;
