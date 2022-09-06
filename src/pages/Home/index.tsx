@@ -34,6 +34,7 @@ export const Home = () => {
   const { handleSubmit, watch, formState, reset } = newCycleForm;
 
   function handleCreateNewCycle(data: NewCycleFormData) {
+    console.log("here", data);
     createNewCycle(data);
     reset();
   }
